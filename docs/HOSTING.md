@@ -5,7 +5,8 @@ Gunakan subdomain khusus, misalnya `booth-api.domainanda.com`. Jangan mengirim k
 
 ## Hosting dan database
 
-Hosting perlu PHP >=8.2, Composer, ekstensi PDO sesuai database, dan HTTPS valid.
+Hosting perlu PHP >=8.2, Composer, MySQL, ekstensi PHP `pdo_mysql`, dan HTTPS valid.
+Template `.env.example` memakai MySQL untuk instalasi baru.
 Document root wajib folder `backend/public`; `.env`, database, `.local`, dan source backend tidak boleh dapat diunduh publik.
 Direktori `storage` dan `bootstrap/cache` harus bisa ditulis pengguna PHP.
 Lihat [panduan deployment Laravel 12](https://laravel.com/framework/docs/12.x/deployment).
@@ -25,6 +26,11 @@ php artisan key:generate
 ```
 
 Perintah `cp`/`key:generate` hanya untuk instalasi baru. Simpan `APP_KEY` yang sudah ada untuk pembaruan.
+Sebelum migrasi, buat database MySQL dan pengguna database melalui panel hosting.
+Hubungkan pengguna tersebut ke database dengan hak akses untuk membuat/mengubah tabel dan membaca/menulis data.
+Gunakan nama database dan pengguna lengkap dari panel (termasuk prefix akun jika ada).
+`DB_HOST` dan `DB_PORT` harus mengikuti informasi penyedia hosting; gunakan InnoDB untuk mendukung transaksi dan penguncian baris.
+
 Atur `.env` secara privat:
 
 ```dotenv
@@ -40,7 +46,9 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_DATABASE=NAMA_DATABASE
 DB_USERNAME=USER_DATABASE
-DB_PASSWORD=PASSWORD_DATABASE
+DB_PASSWORD="PASSWORD_DATABASE"
+DB_CHARSET=utf8mb4
+DB_COLLATION=utf8mb4_unicode_ci
 ```
 
 Gunakan nilai token/hash/key yang telah dikonfigurasi lokal secara privat jika ingin perangkat lama tetap terhubung.
@@ -58,6 +66,13 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 ```
+
+`php artisan migrate --force` membuat tabel aplikasi dalam database yang sudah dibuat; perintah ini tidak membuat database MySQL itu sendiri.
+Untuk memeriksa koneksi dan status tabel, jalankan `php artisan migrate:status` setelah konfigurasi selesai.
+
+Jika instalasi sebelumnya memakai SQLite, ubah `DB_CONNECTION` dan seluruh `DB_*` terkait di `.env` server secara manual.
+Menyalin kode baru tidak mengubah `.env` yang sudah ada. Mengganti koneksi dan menjalankan migrasi hanya membuat skema;
+data pesanan SQLite tidak otomatis dipindahkan ke MySQL. Simpan backup SQLite dan rencanakan pemindahan data tersendiri jika riwayat perlu dipertahankan.
 
 Atur backup database rutin dan uji restore. Database sandbox dan produksi sebaiknya terpisah.
 Migrasi dari Mac ke hosting tanpa membawa database akan membuat pesanan sandbox lama tidak ditemukan;

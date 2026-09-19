@@ -8,13 +8,14 @@ Panduan: [hosting dan produksi](docs/HOSTING.md) · [operasional iPhone/offline/
 ## Setup sandbox lokal
 
 1. `composer install` (pada mesin baru), salin `.env.example` ke `.env` bila belum ada, lalu `php artisan key:generate` untuk instalasi baru.
-2. `python3 scripts/configure_sandbox.py`: masukkan Server Key sandbox secara privat.
+2. Buat database dan pengguna MySQL, lalu isi `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD` di `.env`. PHP memerlukan `pdo_mysql`. Template instalasi baru memakai MySQL; `.env` lokal yang sudah ada tidak berubah otomatis.
+3. `python3 scripts/configure_sandbox.py`: masukkan Server Key sandbox secara privat.
    Token perangkat disimpan di `.local/device-token.txt`, hash SHA-256 di `.env`.
    Skrip selalu menetapkan lingkungan sandbox dan menonaktifkan produksi; token lama dipertahankan.
-3. `php artisan config:clear` lalu `php artisan migrate`.
-4. Jalankan server lokal; iPhone membutuhkan URL HTTPS yang dapat dijangkau. Hosting permanen memakai document root `public`.
-5. Set Notification URL sandbox ke `https://HOST/api/midtrans/notifications`.
-6. Admin iPhone → Koneksi pembayaran QRIS: URL `/api`, token perangkat, Sandbox. Simpan dan relaunch.
+4. `php artisan config:clear` lalu `php artisan migrate`.
+5. Jalankan server lokal; iPhone membutuhkan URL HTTPS yang dapat dijangkau. Hosting permanen memakai document root `public`.
+6. Set Notification URL sandbox ke `https://HOST/api/midtrans/notifications`.
+7. Admin iPhone → Koneksi pembayaran QRIS: URL `/api`, token perangkat, Sandbox. Simpan dan relaunch.
    Konfigurasi disimpan di Keychain. Scheme sandbox lama dapat menimpa konfigurasi Admin ketika Run dari Xcode.
 
 Jangan kirim Server Key ke iPhone/chat/repo. Sandbox dibayar dengan [simulator Midtrans](https://docs.midtrans.com/docs/testing-payment-on-sandbox), bukan uang asli.
@@ -48,7 +49,7 @@ Pengembalian uang dan kasus cetak ambigu perlu ditangani petugas, tidak diproses
 
 ## Verifikasi
 
-`php artisan test`: provider difake, request yang tidak dimock diblokir. Mencakup autentikasi/scope,
+`php artisan test` memakai SQLite in-memory sesuai `phpunit.xml`; tes ini tidak memverifikasi koneksi atau perilaku MySQL. Verifikasi deployment MySQL dengan `php artisan migrate:status` dan alur sandbox pada database hosting. Provider difake, request yang tidak dimock diblokir. Mencakup autentikasi/scope,
 harga, idempotensi charge, nominal, webhook, koneksi, expiry, produksi fail-closed dan reservasi fulfillment.
 Lihat [VERIFICATION.md](docs/VERIFICATION.md) untuk hasil terbaru dan batas pengujian.
 
