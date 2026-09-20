@@ -9,29 +9,28 @@ Setelah lima PIN salah, akses dikunci 30 detik, termasuk setelah relaunch.
 
 Admin tersedia pada Debug dan Release. Pilih Epson L5190, muat kertas 4R (4×6 inci),
 jadikan ukuran/jenis kertas printer sesuai media, lalu lakukan satu test print.
-Salinan mengikuti paket (Basic 1, Double 2, Express 1 secara default).
-Atur countdown, retake, harga lokal dan salinan melalui Admin; katalog QRIS mengikuti backend.
-Tiga frame bawaan tetap tersedia. Frame desain tambahan belum dimasukkan karena aset belum disiapkan.
+Semua paket mengambil enam foto: Cetak Biasa Rp15.000/1 lembar, Double Rp25.000/2 lembar, Triple Rp40.000/3 lembar. Setiap lembar 4R berisi dua strip. Pembaruan harga mereset override paket lama sekali.
+Atur countdown, retake, harga lokal dan salinan melalui Admin.
+Tersedia 16 desain PNG dari arsip pengguna. Foto 1–3 berada di strip kiri, foto 4–6 di strip kanan. Potong vertikal di tengah setelah dicetak. Desain satu strip diulang di kedua sisi; proporsi asli dipertahankan dengan ruang putih bila perlu.
+Stok kode yang dibuat untuk paket lama (3/4 foto atau jumlah lembar berbeda) tidak sesuai dengan paket baru. Siapkan batch baru untuk enam foto sebelum membuka booth.
 
-## Bayar offline ke petugas
+## Persediaan kode pembayaran manual
 
-1. Di layar paket pilih **Bayar ke petugas**, pilih paket dan frame.
-2. Terima pembayaran sesuai total di layar. Ini pembayaran manual, bukan QRIS tanpa internet.
-3. Tekan lama logo → masukkan PIN Admin → **Pembayaran offline**.
-4. Tekan **Uang sudah diterima · Buat kode**, lalu konfirmasi.
-5. Catat kode 8 karakter yang muncul, tutup Admin, berikan kepada pelanggan.
-6. Pelanggan memasukkan kode dan menekan **Gunakan kode** → sesi foto → cetak.
+QRIS bertanda **Belum tersedia** dan tidak dapat ditekan. Paket dan harga menggunakan pengaturan lokal Admin.
 
-Kode berlaku 15 menit, sekali pakai, hanya pada perangkat dan pesanan yang sama.
-Kode disimpan sebagai hash; pembuatan kode baru membatalkan kode lama.
-Lima percobaan salah mengunci penebusan selama 30 detik. Restart tidak menghapus kunci ini.
-Tidak ada QRIS dibuat untuk pesanan offline, sehingga pembayaran manual tidak bersaing dengan QR aktif.
-Jika aplikasi tertutup sebelum kode digunakan, pulihkan pesanan offline yang sama melalui Admin.
-Kode yang masih berlaku dapat dipakai; jika sudah kedaluwarsa, petugas memeriksa bukti pembayaran sebelum membuat pengganti.
-Jika internet gagal saat katalog dimuat, hanya pilihan petugas tersedia. Katalog terakhir dipakai;
-pada perangkat tanpa cache, paket bawaan dipakai. Periksa nominal sebelum menerima uang.
-Offline tidak mengirim data transaksi ke Midtrans atau hosting. Internet tidak diperlukan,
-tetapi iPhone dan printer tetap memerlukan jaringan lokal untuk AirPrint.
+1. Sebelum membuka booth, tekan logo 5 detik → PIN Admin → **Persediaan kode pembayaran**.
+2. Pilih paket dan tekan **Buat 200 kode**. Kode acak unik berisi 10 karakter, khusus paket (termasuk harga dan isi paket) saat dibuat.
+3. Buka batch → **Ekspor ke hosting (.json)**. Pindahkan file ke perangkat petugas, lalu login web `/petugas` dan impor file dengan nama iPhone booth.
+4. Setelah pelanggan membayar, pilih kode tersedia di web sesuai booth/paket → **Sudah bayar · Bagikan** → berikan kode. Setelah pelanggan memakai kode, petugas menekan **Tandai sudah dipakai**. Web tidak tersinkron otomatis dengan iPhone.
+5. Pelanggan memilih paket yang sesuai → frame → **Pembayaran manual** → masukkan kode → **Gunakan kode** → **Masuk ke sesi foto**.
+
+Kode stok tidak kedaluwarsa sebelum digunakan. Kode hanya dapat ditebus sekali, pada iPhone yang membuat stok.
+Admin tidak perlu dibuka setiap transaksi. Jangan ubah harga/isi paket selama kode masih beredar.
+Status pemakaian dan pembayaran disimpan bersama secara atomik, tetap ada setelah restart.
+Lima percobaan salah mengunci penebusan 30 detik, termasuk saat berganti pesanan atau restart.
+Daftar kode tersedia kembali melalui Admin. Simpan daftar hanya untuk petugas; jangan uninstall aplikasi atau menghapus data booth selama stok masih berlaku.
+Kode lama yang sudah dibuat untuk pesanan tertentu tetap dapat ditebus sesuai batas waktu lamanya.
+iPhone tidak mengirim transaksi manual ke hosting. Web hanya catatan manual petugas. Internet tidak diperlukan di iPhone, tetapi iPhone dan printer tetap memerlukan jaringan lokal untuk AirPrint.
 
 ## Pemulihan pembayaran setelah aplikasi tertutup
 
@@ -47,7 +46,7 @@ Cocokkan ID pesanan dan bukti pembayaran dengan pelanggan.
 - Jika foto diterima atau pengembalian uang sudah ditangani petugas, pilih **Tutup kasus setelah ditangani petugas**
   dan tulis catatan. Tombol ini hanya mencatat; tidak melakukan refund atau cetak otomatis.
 
-Jurnal tersimpan di Application Support, hanya metadata tanpa foto/kode mentah.
+Jurnal tersimpan di Application Support tanpa foto. Stok kode mentah disimpan di jurnal agar petugas dapat mengekspor ulang daftar melalui Admin; berkas memakai proteksi data iOS.
 Reservasi cetak QRIS juga disimpan backend sebelum pengiriman. Respons yang hilang tidak boleh memicu pengiriman ulang otomatis.
 Jurnal rusak atau gagal disimpan menahan operasi pembayaran/cetak untuk ditangani petugas.
 Pemulihan terbatas perangkat yang sama; bukan pemulihan setelah uninstall, perpindahan perangkat, atau restore backup lama.
@@ -69,9 +68,9 @@ bukan hitung mundur lokal. Jangan bayar sandbox dengan uang asli.
 
 - Offline: kode salah → ditolak; kode benar → foto/cetak; kode dipakai lagi → ditolak.
 - Restart setelah kode ditebus sebelum foto: Admin dapat melanjutkan pesanan sama tanpa bayar.
-- QRIS sandbox: simulasi bayar → force quit sebelum foto → Admin memverifikasi → lanjut.
+- QRIS: kartu bertanda Belum tersedia tidak dapat ditekan dan tidak membuat pembayaran online.
 - Restart setelah kirim cetak: tidak boleh otomatis cetak ulang; periksa antrean bersama petugas.
-- Internet terputus: QRIS tidak dianggap lunas; pilihan offline bekerja dari sesi baru.
+- Internet terputus: pembayaran manual tetap bekerja dari sesi baru.
 - Paper out, printer mati, 4R, crop, jumlah salinan, dan penerimaan fisik diuji ulang dengan build terbaru.
 - Debug dan Release harus dibangun dan diuji di perangkat. Build Release terbaru belum terverifikasi dalam sesi pengembangan ini.
 

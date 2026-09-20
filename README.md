@@ -57,3 +57,7 @@ Lihat [VERIFICATION.md](docs/VERIFICATION.md) untuk hasil terbaru dan batas peng
 
 Repository ini berisi backend Laravel saja. Aplikasi iOS berada di workspace terpisah.
 Setelah pull di hosting, jalankan `composer install --no-dev --prefer-dist --optimize-autoloader`, `php artisan migrate --force`, lalu `php artisan config:cache`. Jangan menimpa `.env` atau database server.
+
+## Petugas dan persediaan kode offline
+
+Web `/petugas` memerlukan login; buat akun dengan `php artisan booth:staff` sesudah migrasi. Impor file JSON dari menu **Ekspor ke hosting** pada Admin iPhone. Petugas mencatat status pembagian/pemakaian manual di web; iPhone tetap offline dan menyimpan penebusan sekali pakai secara lokal. Paket: Biasa Rp15.000/1 lembar, Double Rp25.000/2 lembar, Triple Rp40.000/3 lembar; semuanya 6 foto. Lihat panduan hosting untuk langkah pembaruan.

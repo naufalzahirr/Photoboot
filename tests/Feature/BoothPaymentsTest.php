@@ -48,11 +48,11 @@ class BoothPaymentsTest extends TestCase {
     }
     private function createOrder(string $client = 'PB-test'): array {
         return $this->withHeader('Idempotency-Key',$client)->postJson('/api/orders',[
-            'client_session_id'=>$client,'package_id'=>'basic','template_id'=>'white','expected_amount'=>25000,
+            'client_session_id'=>$client,'package_id'=>'basic','template_id'=>'white','expected_amount'=>15000,
         ])->assertSuccessful()->json('data');
     }
     private function provider(array $order, string $status = 'pending'): array {
-        return ['order_id'=>$order['id'],'status_code'=>'200','gross_amount'=>'25000.00','currency'=>'IDR',
+        return ['order_id'=>$order['id'],'status_code'=>'200','gross_amount'=>'15000.00','currency'=>'IDR',
             'payment_type'=>'qris','transaction_id'=>'transaction-1','transaction_status'=>$status,'fraud_status'=>'accept',
             'actions'=>[['name'=>'generate-qr-code','url'=>'https://api.sandbox.midtrans.com/v2/qris/transaction-1/qr-code']]];
     }
@@ -111,7 +111,7 @@ class BoothPaymentsTest extends TestCase {
         $order = $this->createOrder('PB-first-response');
         $this->assertSame('pending', $order['status']);
         $this->assertIsInt($order['amount']);
-        $this->assertSame(25000, $order['amount']);
+        $this->assertSame(15000, $order['amount']);
         $this->assertFalse($order['has_qr']);
         $this->assertSame('sandbox', $order['environment']);
         $this->assertIsString($order['expires_at']);
@@ -123,7 +123,7 @@ class BoothPaymentsTest extends TestCase {
         $this->withToken($this->token);
         $a = $this->createOrder(); $b = $this->createOrder(); $this->assertSame($a['id'],$b['id']);
         $this->withHeader('Idempotency-Key','PB-test')->postJson('/api/orders',[
-            'client_session_id'=>'PB-test','package_id'=>'basic','template_id'=>'dark','expected_amount'=>25000,
+            'client_session_id'=>'PB-test','package_id'=>'basic','template_id'=>'dark','expected_amount'=>15000,
         ])->assertConflict();
         $this->withHeader('Idempotency-Key','PB-other')->postJson('/api/orders',[
             'client_session_id'=>'PB-other','package_id'=>'basic','template_id'=>'white','expected_amount'=>1,
@@ -150,9 +150,9 @@ class BoothPaymentsTest extends TestCase {
     }
     public function test_webhook_rejects_forgery_and_ignores_unverified_status(): void {
         $order = $this->createOrder();
-        $payload = ['order_id'=>$order['id'],'status_code'=>'200','gross_amount'=>'25000.00','signature_key'=>str_repeat('0',128)];
+        $payload = ['order_id'=>$order['id'],'status_code'=>'200','gross_amount'=>'15000.00','signature_key'=>str_repeat('0',128)];
         $this->postJson('/api/midtrans/notifications',$payload)->assertForbidden(); Http::assertNothingSent();
-        $payload['signature_key']=hash('sha512',$order['id'].'20025000.00SB-Mid-server-test-only');
+        $payload['signature_key']=hash('sha512',$order['id'].'20015000.00SB-Mid-server-test-only');
         $payload['transaction_status']='settlement';
         Http::fake(['*'=>Http::response($this->provider($order,'pending'))]);
         $this->postJson('/api/midtrans/notifications',$payload)->assertOk();
@@ -173,8 +173,8 @@ class BoothPaymentsTest extends TestCase {
         $this->withHeader('Idempotency-Key',$order['id'])->postJson('/api/orders/'.$order['id'].'/payment')->assertOk();
         Http::assertSent(fn ($request) => $request->url() === 'https://api.sandbox.midtrans.com/v2/charge'
             && $request->hasHeader('Authorization', 'Basic '.base64_encode('Mid-server-test-only:')));
-        $payload = ['order_id'=>$order['id'],'status_code'=>'200','gross_amount'=>'25000.00',
-            'signature_key'=>hash('sha512',$order['id'].'20025000.00Mid-server-test-only')];
+        $payload = ['order_id'=>$order['id'],'status_code'=>'200','gross_amount'=>'15000.00',
+            'signature_key'=>hash('sha512',$order['id'].'20015000.00Mid-server-test-only')];
         $this->postJson('/api/midtrans/notifications',$payload)->assertOk();
     }
     public function test_missing_sandbox_key_fails_closed_without_reserving_charge(): void {

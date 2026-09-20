@@ -114,3 +114,34 @@ Pembelian hosting/domain, pemasangan SSL pada panel, aktivasi merchant, refund n
 perubahan harga produksi, dan unggah ke hosting tidak dijalankan dari workspace ini.
 Nama penyedia/domain serta akses deployment belum tersedia pada sesi ini.
 Tidak ada worker queue khusus diperlukan untuk alur sinkron saat ini.
+
+## Web petugas untuk kode offline
+
+Buka `https://photo.silap.smkn4tpi.sch.id/petugas` setelah kode terbaru diunggah.
+Web ini hanya pencatatan petugas; iPhone menebus kode secara lokal tanpa internet. Status web tidak tersinkron otomatis.
+
+Setelah memperbarui backend (jangan menimpa `.env` atau `APP_KEY`):
+
+```sh
+composer install --no-dev --prefer-dist --optimize-autoloader
+php artisan config:clear
+php artisan migrate --force
+php artisan booth:staff
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+`booth:staff` meminta email dan password secara interaktif (minimal 12 karakter). Gunakan akun berbeda per petugas jika perlu; jalankan perintah lagi untuk membuat akun lain atau mengganti password akun yang sama.
+Pastikan `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://photo.silap.smkn4tpi.sch.id`, dan `SESSION_SECURE_COOKIE=true` pada hosting HTTPS.
+Tidak ada pendaftaran akun publik. Jangan mengirim password melalui chat atau memasukkannya ke GitHub.
+
+1. Jalankan build iPhone terbaru. Harga paket: Biasa Rp15.000/1 lembar, Double Rp25.000/2 lembar, Triple Rp40.000/3 lembar. Semuanya 6 foto.
+2. Di Admin iPhone → Persediaan kode pembayaran → pilih paket → Buat 200 kode → buka batch → Ekspor ke hosting (.json).
+3. Simpan file, pindahkan melalui AirDrop/kabel atau bagikan saat perangkat terhubung. Internet tidak diperlukan saat booth dipakai.
+4. Login web → Impor persediaan → isi nama iPhone/booth → unggah JSON. Hanya kode yang sudah ada pada iPhone itu yang dapat digunakan di booth.
+5. Sesudah menerima uang, petugas menekan **Sudah bayar · Bagikan**, lalu memberikan kode. Setelah pelanggan menggunakannya, tekan **Tandai sudah dipakai** secara manual.
+
+Impor ulang dengan nama booth yang sama tidak mereset status. Impor pertama membawa status terpakai dari ekspor; tanggalnya merupakan tanggal impor, bukan waktu penggunaan asli. Perubahan status di web tidak mengubah iPhone.
+Kode stok lama yang harga/isi paketnya berbeda harus diganti batch baru. Pembaruan katalog iPhone mereset override harga/jumlah lembar lama sekali; preferensi kamera dan retake dipertahankan.
+Jangan menghapus data/uninstall iPhone selama stok beredar. Satu batch digunakan pada satu iPhone; web tidak menyediakan penebusan atau pembuatan kode baru.

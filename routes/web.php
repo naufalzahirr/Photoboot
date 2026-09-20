@@ -1,7 +1,13 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
-
-Route::get('/', function () {
-    return view('welcome');
+use App\Http\Controllers\StaffController;
+Route::get('/', fn () => redirect('/petugas'));
+Route::get('/petugas/login', fn () => view('staff.login'))->name('login');
+Route::post('/petugas/login',[StaffController::class,'login'])->middleware('throttle:5,1');
+Route::middleware('auth')->group(function () {
+    Route::get('/petugas',[StaffController::class,'index']);
+    Route::post('/petugas/logout',[StaffController::class,'logout']);
+    Route::post('/petugas/import',[StaffController::class,'import'])->middleware('throttle:5,1');
+    Route::post('/petugas/codes/{code}/used',[StaffController::class,'markUsed']);
+    Route::post('/petugas/codes/{code}/distribute',[StaffController::class,'distribute']);
 });
