@@ -18,19 +18,15 @@ Stok kode yang dibuat untuk paket lama (3/4 foto atau jumlah lembar berbeda) tid
 
 QRIS bertanda **Belum tersedia** dan tidak dapat ditekan. Paket dan harga menggunakan pengaturan lokal Admin.
 
-1. Sebelum membuka booth, tekan logo 5 detik → PIN Admin → **Persediaan kode pembayaran**.
-2. Pilih paket dan tekan **Buat 200 kode**. Kode acak unik berisi 10 karakter, khusus paket (termasuk harga dan isi paket) saat dibuat.
-3. Buka batch → **Ekspor ke hosting (.json)**. Pindahkan file ke perangkat petugas, lalu login web `/petugas` dan impor file dengan nama iPhone booth.
-4. Setelah pelanggan membayar, pilih kode tersedia di web sesuai booth/paket → **Sudah bayar · Bagikan** → berikan kode. Setelah pelanggan memakai kode, petugas menekan **Tandai sudah dipakai**. Web tidak tersinkron otomatis dengan iPhone.
-5. Pelanggan memilih paket yang sesuai → frame → **Pembayaran manual** → masukkan kode → **Gunakan kode** → **Masuk ke sesi foto**.
+1. Pasang aplikasi terbaru pada satu iPhone booth. Stok 600 kode dipasang otomatis: 200 untuk setiap paket (Biasa/Double/Triple).
+2. Login web `/petugas`. Stok identik tersedia otomatis; tidak perlu impor, ekspor, atau membuat batch.
+3. Sesudah menerima uang, pilih kode sesuai paket → **Sudah bayar · Bagikan**. Berikan kode tersebut kepada pelanggan.
+4. Pelanggan memilih paket → frame → Pembayaran manual → masukkan kode → Gunakan kode → Masuk ke sesi foto.
+5. Petugas menandai **Sudah dipakai** di web secara manual. iPhone tetap offline.
 
-Kode stok tidak kedaluwarsa sebelum digunakan. Kode hanya dapat ditebus sekali, pada iPhone yang membuat stok.
-Admin tidak perlu dibuka setiap transaksi. Jangan ubah harga/isi paket selama kode masih beredar.
-Status pemakaian dan pembayaran disimpan bersama secara atomik, tetap ada setelah restart.
-Lima percobaan salah mengunci penebusan 30 detik, termasuk saat berganti pesanan atau restart.
-Daftar kode tersedia kembali melalui Admin. Simpan daftar hanya untuk petugas; jangan uninstall aplikasi atau menghapus data booth selama stok masih berlaku.
-Kode lama yang sudah dibuat untuk pesanan tertentu tetap dapat ditebus sesuai batas waktu lamanya.
-iPhone tidak mengirim transaksi manual ke hosting. Web hanya catatan manual petugas. Internet tidak diperlukan di iPhone, tetapi iPhone dan printer tetap memerlukan jaringan lokal untuk AirPrint.
+Kode tidak kedaluwarsa sebelum ditebus; pemakaian sekali disimpan lokal secara atomik bersama pembayaran. Restart/pembaruan biasa mempertahankan riwayat. Lima kode salah mengunci penebusan selama 30 detik.
+Jangan uninstall aplikasi atau menghapus datanya selama stok beredar. Satu stok bawaan untuk satu iPhone booth aktif; dua iPhone offline tidak berbagi status pemakaian. Pembaruan tidak menghapus batch/riwayat lama.
+Daftar hanya ditampilkan kepada petugas yang login. iPhone dan printer tetap membutuhkan jaringan lokal untuk AirPrint, tanpa internet.
 
 ## Pemulihan pembayaran setelah aplikasi tertutup
 

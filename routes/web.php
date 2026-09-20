@@ -7,7 +7,6 @@ Route::post('/petugas/login',[StaffController::class,'login'])->middleware('thro
 Route::middleware('auth')->group(function () {
     Route::get('/petugas',[StaffController::class,'index']);
     Route::post('/petugas/logout',[StaffController::class,'logout']);
-    Route::post('/petugas/import',[StaffController::class,'import'])->middleware('throttle:5,1');
     Route::post('/petugas/codes/{code}/used',[StaffController::class,'markUsed']);
     Route::post('/petugas/codes/{code}/distribute',[StaffController::class,'distribute']);
 });

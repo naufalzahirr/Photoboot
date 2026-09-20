@@ -136,12 +136,10 @@ php artisan view:cache
 Pastikan `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://photo.silap.smkn4tpi.sch.id`, dan `SESSION_SECURE_COOKIE=true` pada hosting HTTPS.
 Tidak ada pendaftaran akun publik. Jangan mengirim password melalui chat atau memasukkannya ke GitHub.
 
-1. Jalankan build iPhone terbaru. Harga paket: Biasa Rp15.000/1 lembar, Double Rp25.000/2 lembar, Triple Rp40.000/3 lembar. Semuanya 6 foto.
-2. Di Admin iPhone → Persediaan kode pembayaran → pilih paket → Buat 200 kode → buka batch → Ekspor ke hosting (.json).
-3. Simpan file, pindahkan melalui AirDrop/kabel atau bagikan saat perangkat terhubung. Internet tidak diperlukan saat booth dipakai.
-4. Login web → Impor persediaan → isi nama iPhone/booth → unggah JSON. Hanya kode yang sudah ada pada iPhone itu yang dapat digunakan di booth.
-5. Sesudah menerima uang, petugas menekan **Sudah bayar · Bagikan**, lalu memberikan kode. Setelah pelanggan menggunakannya, tekan **Tandai sudah dipakai** secara manual.
+1. Pasang build iPhone terbaru. Aplikasi otomatis memasang 600 kode tetap: 200 Biasa Rp15.000/1 lembar, 200 Double Rp25.000/2 lembar, 200 Triple Rp40.000/3 lembar. Semua paket enam foto.
+2. Login `/petugas`. Daftar 600 kode yang identik otomatis dipasang pada kunjungan pertama, tanpa impor atau pembuatan batch manual.
+3. Pilih paket dan kode tersedia → terima uang → **Sudah bayar · Bagikan**. Setelah pelanggan memakai kode di iPhone, petugas menekan **Tandai sudah dipakai**.
 
-Impor ulang dengan nama booth yang sama tidak mereset status. Impor pertama membawa status terpakai dari ekspor; tanggalnya merupakan tanggal impor, bukan waktu penggunaan asli. Perubahan status di web tidak mengubah iPhone.
-Kode stok lama yang harga/isi paketnya berbeda harus diganti batch baru. Pembaruan katalog iPhone mereset override harga/jumlah lembar lama sekali; preferensi kamera dan retake dipertahankan.
-Jangan menghapus data/uninstall iPhone selama stok beredar. Satu batch digunakan pada satu iPhone; web tidak menyediakan penebusan atau pembuatan kode baru.
+Pembaruan/restart tidak mengaktifkan kembali kode terpakai. Daftar lama tetap disimpan; 600 kode bawaan ditambahkan tanpa menghapus riwayat.
+Status web bersifat manual. iPhone tidak memerlukan internet. Jangan uninstall/menghapus data iPhone: tindakan itu menghapus riwayat pemakaian lokal. Gunakan stok bersama ini pada satu iPhone booth aktif karena dua iPhone offline tidak dapat saling mencegah penebusan kode yang sama.
+Daftar permanen berada pada konfigurasi backend di luar folder public dan konstanta aplikasi. Jangan regenerasi daftar saat deployment; keduanya harus tetap identik. Jangan publikasikan source daftar kode kepada pelanggan.

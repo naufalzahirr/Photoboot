@@ -60,4 +60,4 @@ Setelah pull di hosting, jalankan `composer install --no-dev --prefer-dist --opt
 
 ## Petugas dan persediaan kode offline
 
-Web `/petugas` memerlukan login; buat akun dengan `php artisan booth:staff` sesudah migrasi. Impor file JSON dari menu **Ekspor ke hosting** pada Admin iPhone. Petugas mencatat status pembagian/pemakaian manual di web; iPhone tetap offline dan menyimpan penebusan sekali pakai secara lokal. Paket: Biasa Rp15.000/1 lembar, Double Rp25.000/2 lembar, Triple Rp40.000/3 lembar; semuanya 6 foto. Lihat panduan hosting untuk langkah pembaruan.
+Web `/petugas` memerlukan login; buat akun dengan `php artisan booth:staff` sesudah migrasi. 600 kode tetap (200 per paket) otomatis tersedia pada login pertama dan aplikasi iPhone terbaru. Tidak perlu impor. Status web dicatat manual oleh petugas; penebusan iPhone tetap offline. Harga: Biasa Rp15.000/1 lembar, Double Rp25.000/2 lembar, Triple Rp40.000/3 lembar, semuanya 6 foto. Gunakan satu iPhone booth aktif untuk stok ini. Pembaruan mempertahankan kode terpakai.
