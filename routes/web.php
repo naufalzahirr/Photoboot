@@ -10,3 +10,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/petugas/codes/{code}/used',[StaffController::class,'markUsed']);
     Route::post('/petugas/codes/{code}/distribute',[StaffController::class,'distribute']);
 });
+
+Route::get('/foto/{photo}', [\App\Http\Controllers\PhotoDownloadController::class, 'show'])->name('photos.show')->middleware(['signed', 'throttle:60,1']);

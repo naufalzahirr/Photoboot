@@ -4,6 +4,7 @@ use App\Http\Controllers\BoothController;
 use App\Http\Middleware\BoothDevice;
 Route::post('/midtrans/notifications',[BoothController::class,'webhook'])->middleware('throttle:60,1');
 Route::middleware([BoothDevice::class,'throttle:120,1'])->group(function () {
+    Route::post('/photos', [\App\Http\Controllers\PhotoDownloadController::class, 'upload'])->middleware('throttle:20,1');
     Route::get('/orders-by-session/{clientID}/payment-status',[BoothController::class,'recover']);
     Route::post('/orders/{id}/fulfillment',[BoothController::class,'reserveFulfillment']);
     Route::get('/packages',[BoothController::class,'packages']);

@@ -143,3 +143,39 @@ Tidak ada pendaftaran akun publik. Jangan mengirim password melalui chat atau me
 Pembaruan/restart tidak mengaktifkan kembali kode terpakai. Daftar lama tetap disimpan; 600 kode bawaan ditambahkan tanpa menghapus riwayat.
 Status web bersifat manual. iPhone tidak memerlukan internet. Jangan uninstall/menghapus data iPhone: tindakan itu menghapus riwayat pemakaian lokal. Gunakan stok bersama ini pada satu iPhone booth aktif karena dua iPhone offline tidak dapat saling mencegah penebusan kode yang sama.
 Daftar permanen berada pada konfigurasi backend di luar folder public dan konstanta aplikasi. Jangan regenerasi daftar saat deployment; keduanya harus tetap identik. Jangan publikasikan source daftar kode kepada pelanggan.
+
+## QR download foto digital
+
+Pembaruan backend dan build iPad diperlukan; backend lama tidak memiliki endpoint upload ini.
+Arsip terbaru dibuat dengan `python3 scripts/package_backend.py`, tersedia di `dist/photobooth-backend.zip`.
+Unggah source tanpa menimpa `.env`, `APP_KEY`, `storage`, atau database. Kemudian:
+
+```sh
+php artisan config:clear
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+- `APP_URL` harus URL HTTPS hosting yang sama dengan URL API di iPad. Token perangkat memakai konfigurasi yang sudah ada; fitur download tidak memerlukan Midtrans produksi.
+- Endpoint `POST /api/photos` membutuhkan token perangkat dan menerima JPEG 1200 × 1800 maksimal 8 MiB (JSON base64). Atur `post_max_size` PHP minimal `16M`, `memory_limit` minimal `128M`, dan batas request web server minimal 16 MiB. Upload tidak memerlukan `storage:link`.
+- Foto disimpan privat di `storage/app/private/photo-downloads`, bukan folder publik. Database hanya menyimpan ID pesanan/perangkat, checksum, dan masa berlaku; nama pelanggan tidak diunggah.
+- `/foto/{id}` membutuhkan URL bertanda tangan yang dibuat backend. URL polos, perubahan parameter, dan tautan kedaluwarsa ditolak. Link berlaku 7 hari dan jangan dibagikan ke pihak lain selain pelanggan.
+- Pasang cron hosting setiap menit (ganti path dan PHP sesuai hosting): `* * * * * cd /path/backend && php artisan schedule:run >> /dev/null 2>&1`. Scheduler menghapus file kedaluwarsa setiap hari. Bila cron belum tersedia, jalankan `php artisan booth:prune-photos` secara rutin; link tetap berhenti berlaku walau file belum dibersihkan.
+- Perkiraan kapasitas: jumlah sesi per hari × ukuran JPEG × 7 hari, ditambah ruang cadangan dan backup hosting. Jangan mengganti `APP_KEY` karena tautan aktif bergantung pada key tersebut.
+
+Uji di iPad: selesaikan sesi → Simpan dulu → tunggu QR → scan dari HP memakai jaringan seluler → download JPG. Putus internet iPad dan pastikan foto lokal masih ada, lalu coba upload dari Admin setelah internet pulih. Update ini belum diunggah otomatis ke hosting.
+
+
+### Tombol QR hanya loading sebentar lalu muncul lagi
+
+Ini menandakan upload belum berhasil; QR baru tersedia setelah hosting mengembalikan tautan valid. Build terbaru mempertahankan tombol/status dan menampilkan penyebab HTTP:
+
+- **404/405**: periksa URL API (harus berakhir `/api`), unggah backend terbaru, jalankan migrasi dan bersihkan/bangun ulang route cache.
+- **401/403**: token perangkat iPad tidak sesuai dengan hash token hosting.
+- **413**: naikkan batas request web server/PHP agar menerima JSON minimal 16 MiB.
+- **500/503**: periksa migrasi tabel `photo_downloads`, izin tulis storage, dan log Laravel melalui akses petugas hosting.
+- Gangguan koneksi: periksa internet iPad; foto lokal tetap tersimpan untuk percobaan berikutnya.
+
+Pemeriksaan baca-saja pada 20 September 2026: `/api/packages` merespons 401 tanpa token (endpoint aktif), sedangkan GET dan OPTIONS `/api/photos` merespons 404. Ini menunjukkan route upload belum tersedia pada deployment yang diperiksa. Sesudah update, `php artisan route:list --path=photos` harus menampilkan `POST api/photos`; GET pada endpoint POST biasanya membalas 405. Jangan menyalin token atau log sensitif ke chat.
